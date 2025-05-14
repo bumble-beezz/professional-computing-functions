@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Professional Computing Ltd - Payment Diary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="payment-diary">
+    <nav class="navbar">
+        <div class="logo">Professional Computing Ltd</div>
+        
+        <div class="diary-tabs">
+            <button class="tab" data-diary="daily">Daily Diary</button>
+            <button class="tab" data-diary="payment">Payment Diary</button>
+            <button class="tab" data-diary="worksheets">Worksheets</button>
+        </div>
+        
+        <div class="user-controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search clients...">
+                <button class="search-btn">🔍</button>
+            </div>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="diary-container">
+        <div class="entry-card payment-highlight">
+            <div class="entry-header">
+                <span class="client-name">Client: ABC Corp</span>
+                <span class="date">15 May 2023</span>
+            </div>
+            
+            <div class="entry-details">
+                <div class="detail">
+                    <label>Invoice #:</label>
+                    <input type="text" value="INV-2023-056">
+                </div>
+                
+                <div class="detail">
+                    <label>Amount:</label>
+                    <input type="text" value="£1,250.00">
+                </div>
+                
+                <div class="detail">
+                    <label>Payment Date:</label>
+                    <span>15 May 2023</span>
+                </div>
+                
+                <div class="detail">
+                    <label>BF Date:</label>
+                    <span>22 May 2023</span>
+                    <button class="edit-btn">✏️ Update</button>
+                </div>
+                
+                <div class="detail">
+                    <label>Call Notes:</label>
+                    <textarea class="notes">Payment received via bank transfer...</textarea>
+                </div>
+                
+                <div class="detail">
+                    <label>Product/Software:</label>
+                    <span>Inventory Management System</span>
+                </div>
+                
+                <div class="detail">
+                    <label>Client Contact:</label>
+                    <span>John Smith (john@abccorp.com)</span>
+                </div>
+                
+                <button class="save-btn">💾 Save Payment</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

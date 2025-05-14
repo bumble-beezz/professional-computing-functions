@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Computing Ltd - Diaries</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h1>Professional Computing Ltd</h1>
+        <div class="nav-links">
+            <a href="#" class="diary-link" data-diary="daily">Daily Diary</a>
+            <a href="#" class="diary-link" data-diary="payment">Payment Diary</a>
+            <a href="#" class="diary-link" data-diary="worksheets">Worksheets</a>
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </div>
+    
+    <div class="diary-container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by client or company name...">
+        </div>
+        
+        <!-- daily Diary Section -->
+        <div id="daily-diary" class="diary-section">
+            <h2>Daily Diary</h2>
+            <div id="daily-entries" class="diary-entries"></div>
+        </div>
+        
+        <!-- payment Diary Section -->
+        <div id="payment-diary" class="diary-section hidden">
+            <h2>Payment Diary</h2>
+            <div id="payment-entries" class="diary-entries"></div>
+        </div>
+        
+        <!-- worksheets Section -->
+        <div id="worksheets-diary" class="diary-section hidden">
+            <h2>Worksheets</h2>
+            <div id="worksheets-entries" class="diary-entries"></div>
+        </div>
+    </div>
+    
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

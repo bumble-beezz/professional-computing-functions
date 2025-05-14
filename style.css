@@ -1,0 +1,185 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #e8f5e9;
+    margin: 0;
+    padding: 0;
+    color: #2e7d32; 
+}
+
+.login-container {
+    width: 350px;
+    margin: 100px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2e7d32;
+}
+
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #a5d6a7;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #388e3c;
+}
+
+.error-message {
+    color: #d32f2f;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Navigation styles */
+.navbar {
+    background-color: #2e7d32;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h1 {
+    color: white;
+    margin: 0;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.nav-links a:hover {
+    background-color: #4caf50;
+}
+
+/*diary page styles */
+.diary-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #a5d6a7;
+    border-radius: 5px;
+}
+
+.diary-entries {
+    margin-top: 20px;
+}
+
+.entry {
+    border: 1px solid #c8e6c9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #f1f8e9;
+}
+
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.entry-content {
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+.payment-highlight {
+    border-left: 4px solid #1976D2; 
+}
+
+.worksheet-highlight {
+    border-left: 4px solid #FFA000; 
+}
+
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    color: white;
+}
+
+.status-badge.in-progress {
+    background: #FB8C00;
+}
+
+.status-badge.completed {
+    background: #43A047;
+}
+
+textarea.notes {
+    width: 100%;
+    min-height: 60px;
+    padding: 8px;
+    border: 1px solid #BDBDBD;
+    border-radius: 4px;
+}
+
+.save-btn {
+    background: #2E7D32;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}

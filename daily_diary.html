@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Professional Computing Ltd - Daily Diary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="daily-diary">
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <div class="logo">Professional Computing Ltd</div>
+        
+        <div class="diary-tabs">
+            <button class="tab" data-diary="daily">Daily Diary</button>
+            <button class="tab" data-diary="payment">Payment Diary</button>
+            <button class="tab" data-diary="worksheets">Worksheets</button>
+        </div>
+        
+        <div class="user-controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search clients...">
+                <button class="search-btn">🔍</button>
+            </div>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="diary-container">
+        <div class="entry-card">
+            <div class="entry-header">
+                <span class="client-name">Client: ABC Corp</span>
+                <span class="date">15 May 2023</span>
+            </div>
+            
+            <div class="entry-details">
+                <div class="detail">
+                    <label>Current Date:</label>
+                    <span id="currentDate">15 May 2023</span>
+                </div>
+                
+                <div class="detail">
+                    <label>BF Date:</label>
+                    <span>22 May 2023</span>
+                    <button class="edit-btn">✏️ Update</button>
+                </div>
+                
+                <div class="detail">
+                    <label>Call Notes:</label>
+                    <textarea class="notes">Discussed new software requirements...</textarea>
+                </div>
+                
+                <div class="detail">
+                    <label>Invoice #:</label>
+                    <span>INV-2023-056</span>
+                </div>
+                
+                <div class="detail">
+                    <label>Amount:</label>
+                    <span>£1,250.00</span>
+                </div>
+                
+                <div class="detail">
+                    <label>Product/Software:</label>
+                    <span>Inventory Management System</span>
+                </div>
+                
+                <div class="detail">
+                    <label>Client Contact:</label>
+                    <span>John Smith (john@abccorp.com)</span>
+                </div>
+                
+                <button class="save-btn">💾 Save Changes</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
