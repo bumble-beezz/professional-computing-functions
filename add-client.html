@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add New Client</title>
+  <style>
+    /* Post-it note styling */
+    .diary-entry {
+      background: #fff9c4;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 5px;
+      box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+      font-family: 'Comic Sans MS', cursive;
+    }
+    /* Caribbean color theme */
+    body {
+      background: #e8f5e9;
+      font-family: Arial, sans-serif;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="diary-entry">
+    <h2>Add New Client</h2>
+    
+    <div class="form-group">
+      <label>
+        <input type="checkbox" id="isCompany"> Company/Organization
+      </label>
+    </div>
+
+    <div id="companyFields" style="display:none;">
+      <div class="form-group">
+        <label for="companyName">Company Name*</label>
+        <input type="text" id="companyName" required>
+      </div>
+      <div class="form-group">
+        <label for="payFrequency">Pay Frequency</label>
+        <select id="payFrequency">
+          <option value="monthly">Monthly</option>
+          <option value="biweekly">Bi-weekly</option>
+          <option value="weekly">Weekly</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>Primary Contact</h3>
+    <div class="form-group">
+      <label for="firstName">First Name*</label>
+      <input type="text" id="firstName" required>
+    </div>
+    <div class="form-group">
+      <label for="lastName">Last Name*</label>
+      <input type="text" id="lastName" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email*</label>
+      <input type="email" id="email" required>
+    </div>
+
+    <h3>Caribbean Phone Numbers</h3>
+    <div class="form-group">
+      <label for="mobile">Mobile (e.g. +1(868)123-4567)</label>
+      <input type="tel" id="mobile" pattern="\+1\(\d{3}\)\d{3}-\d{4}">
+    </div>
+    <div class="form-group">
+      <label for="work">Work</label>
+      <input type="tel" id="work" pattern="\+1\(\d{3}\)\d{3}-\d{4}">
+    </div>
+
+    <button id="saveBtn" style="background:#2e7d32;">Save Client</button>
+  </div>
+
+  <script type="module">
+    import { addClient } from './db-operations.js';
+    
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const clientData = {
+        name: document.getElementById('companyName').value,
+        payFrequency: document.getElementById('payFrequency').value
+      };
+      
+      const contacts = [{
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phones: {
+          mobile: formatCaribbeanPhone(document.getElementById('mobile').value),
+          work: formatCaribbeanPhone(document.getElementById('work').value)
+        }
+      }];
+      
+      function formatCaribbeanPhone(phone) {
+        // Converts +1(868)123-4567 to +18681234567
+        return phone ? phone.replace(/\D/g, '') : null;
+      }
+      
+      await addClient(clientData, contacts);
+      alert('Client added successfully!');
+    });
+  </script>
+</body>
+</html>
+/*Security Rules
+{
+  "rules": {
+    "clients": {
+      "$clientId": {
+        ".read": "auth != null",
+        "diaryRefs": {
+          ".write": "newData.parent().child('name').exists()"
+        }
+      }
+    },
+    "diaries": {
+      "$diaryType": {
+        "$entryId": {
+          ".validate": "newData.child('clientId').val() == $clientId",
+          ".write": "root.child('clients/'+newData.child('clientId').val()+'/diaryRefs/'+$diaryType).exists()"
+        }
+      }
+    }
+  }
+}
+  Here's a clear example of how to convert your existing data into the Realtime Database format, with verification that the functions will work correctly:
+
+  2. Data Conversion Examples
+  Your Current Format (Before):
+  json
+  {
+    "client_1": {
+      "company_name": "Tech Solutions Ltd",
+      "contact_name": "John Smith",
+      "tel_no#": "02081234567",
+      "email_add": "john@tech.com",
+      "pay_frequency": "monthly"
+    },
+    "client_2": {
+      "company_name": null,
+      "contact_name": "Emma Wilson",
+      "cell_no#": "07700123456"
+    }
+  }
+  Converted Format (After):
+  json
+  {
+    "clients": {
+      "comp_tech123": {
+        "name": "Tech Solutions Ltd",
+        "payFrequency": "monthly",
+        "diaryRefs": {
+          "daily": true,
+          "payment": true
+        }
+      }
+    },
+    "contacts": {
+      "cont_john456": {
+        "firstName": "John",
+        "lastName": "Smith",
+        "email": "john@tech.com",
+        "companyId": "comp_tech123",
+        "phones": {
+          "work": "+442081234567"
+        }
+      },
+      "cont_emma789": {
+        "firstName": "Emma",
+        "lastName": "Wilson",
+        "companyId": null,
+        "phones": {
+          "mobile": "+447700123456"
+        }
+      }
+    }
+  }
+  How to Implement
+  Deploy Rules:
+  
+  bash
+  firebase deploy --only database
+  Import Existing Data:
+  
+  javascript
+  import { getDatabase, ref, update } from "firebase/database";
+  
+  const db = getDatabase();
+  const oldData = { /* your current JSON */ };
+  
+  Object.keys(oldData).forEach(clientKey => {
+    const converted = convertClient(oldData[clientKey], `comp_${clientKey}`);
+    update(ref(db), converted);
+  });
+  Add New Diary Entry:
+  
+  javascript
+  await addDiaryEntry("comp_tech123", "daily", {
+    notes: "Client requested new feature",
+    bfDate: "2023-09-15",
+    createdBy: "user123"
+  });
+}*/

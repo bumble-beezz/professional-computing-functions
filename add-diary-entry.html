@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Diary Entry</title>
+  <style>
+    .post-it {
+      background: #fff9c4;
+      width: 300px;
+      padding: 20px;
+      margin: 20px auto;
+      box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+      transform: rotate(2deg);
+      font-family: 'Comic Sans MS', cursive;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      background: transparent;
+      border: 1px dashed #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="post-it">
+    <h2>New Diary Entry</h2>
+    
+    <div class="form-group">
+      <label for="clientSearch">Search Client:</label>
+      <input type="text" id="clientSearch" placeholder="Start typing...">
+      <div id="clientResults"></div>
+    </div>
+    
+    <div class="form-group">
+      <label for="diaryType">Diary Type:</label>
+      <select id="diaryType">
+        <option value="daily">Daily Diary</option>
+        <option value="payment">Payment Diary</option>
+        <option value="worksheets">Worksheets</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="notes">Notes:</label>
+      <textarea id="notes" placeholder="Write your notes here..."></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="bfDate">Follow-up Date:</label>
+      <input type="date" id="bfDate">
+    </div>
+    
+    <button id="saveBtn" style="background:#ff9800;">Save Entry</button>
+  </div>
+
+  <script type="module">
+    import { addDiaryEntry, searchClients } from './db-operations.js';
+    
+    // Client search functionality
+    document.getElementById('clientSearch').addEventListener('input', async (e) => {
+      const results = await searchClients(e.target.value);
+      const resultsDiv = document.getElementById('clientResults');
+      resultsDiv.innerHTML = results.map(client => `
+        <div onclick="selectClient('${client.id}', '${client.name}')">
+          ${client.name} (${client.type})
+        </div>
+      `).join('');
+    });
+    
+    window.selectClient = (id, name) => {
+      document.getElementById('clientSearch').value = name;
+      document.getElementById('clientId').value = id;
+      document.getElementById('clientResults').innerHTML = '';
+    };
+    
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      await addDiaryEntry(
+        document.getElementById('clientId').value,
+        document.getElementById('diaryType').value,
+        {
+          notes: document.getElementById('notes').value,
+          bfDate: document.getElementById('bfDate').value,
+          createdBy: firebase.auth().currentUser.uid
+        }
+      );
+      alert('Entry added!');
+    });
+  </script>
+</body>
+</html>

@@ -1,21 +1,69 @@
 //wait for DOM to load
 document.addEventListener('DOMContentLoaded', function() {
-    //check if we're on the login page
+    // Only run auth code on login page
     if (document.getElementById('loginForm')) {
-        setupLogin();
-    }
-    
-    //check if we're on the home page
-    if (document.getElementById('logoutBtn')) {
-        setupHomePage();
-    }
-    //check if we're on any diary page
-    if (document.querySelector('.diary-tabs')) {
-        setupDiaryTabs();
-        setupHomePage();
-        highlightCurrentTab();
+        initAuth();
     }
 });
+
+// Main authentication function
+function initAuth() {
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        loginError.textContent = '';
+
+        try {
+            // 1. Sign in with Firebase Auth
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            
+            // 2. Manual "pre-registered users" check (no Firestore needed)
+            const allowedDomains = ['@procom.com', '@professionalcomputing.co.uk'];
+            const isAllowed = allowedDomains.some(domain => email.endsWith(domain));
+            
+            if (!isAllowed) {
+                await firebase.auth().signOut();
+                throw new Error('Unauthorized domain');
+            }
+
+            // 3. Redirect on success
+            window.location.href = 'home.html';
+            
+        } catch (error) {
+            handleAuthError(error, loginError);
+        }
+    });
+}
+
+// Error handling
+function handleAuthError(error, loginError) {
+    console.error('Auth error:', error);
+    
+    const messages = {
+        'auth/wrong-password': 'Wrong password',
+        'auth/user-not-found': 'User not found',
+        'Unauthorized domain': 'Only company emails allowed',
+        default: 'Login failed. Try again later.'
+    };
+
+    loginError.textContent = messages[error.code] || messages[error.message] || messages.default;
+}
+
+// Protect all other pages
+firebase.auth().onAuthStateChanged(user => {
+    if (!user && !location.pathname.includes('index.html')) {
+        window.location.href = 'index.html';
+    }
+});
+
+
+
+
 
 function setupLogin() {
     const loginForm = document.getElementById('loginForm');
@@ -763,3 +811,31 @@ function updateBFDate(entryId, diaryType) {
             alert('Error updating BF Date: ' + error.message);
         });
 }
+
+
+function addCompanyWithContacts(companyData, contacts) {
+    const db = firebase.database();
+    const companyId = db.ref('companies').push().key;
+    
+    const updates = {};
+    
+    // Add company
+    updates[`companies/${companyId}`] = {
+      ...companyData,
+      contacts: {} // Initialize contacts map
+    };
+    
+    // Add contacts
+    contacts.forEach(contact => {
+      const contactId = db.ref('contacts').push().key;
+      updates[`contacts/${contactId}`] = {
+        ...contact,
+        companyId: companyId
+      };
+      updates[`companies/${companyId}/contacts/${contactId}`] = true;
+    });
+    
+    return db.ref().update(updates);
+  }
+
+  

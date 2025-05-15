@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Employee</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; }
+        button { background: #4CAF50; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Add Employee to Company</h1>
+    
+    <div class="form-group">
+        <label for="companyId">Company ID</label>
+        <input type="text" id="companyId" placeholder="comp_xyz123" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="firstName">First Name*</label>
+        <input type="text" id="firstName" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="lastName">Last Name*</label>
+        <input type="text" id="lastName" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="email">Email*</label>
+        <input type="email" id="email" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="mobile">Mobile</label>
+        <input type="tel" id="mobile" placeholder="+447700123456">
+    </div>
+    
+    <button id="submitBtn">Add Employee</button>
+    <div id="result"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const companyId = document.getElementById('companyId').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!companyId || !firstName || !lastName || !email) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const employeeData = {
+                firstName,
+                lastName,
+                email,
+                phones: {
+                    mobile: document.getElementById('mobile').value.replace(/\D/g, '') || null
+                }
+            };
+            
+            try {
+                const db = firebase.database();
+                // Verify company exists
+                const company = (await db.ref(`companies/${companyId}`).once('value')).val();
+                if (!company) throw new Error("Company not found");
+                
+                // Add employee
+                const contactId = await addEmployeeToCompany(companyId, employeeData);
+                document.getElementById('result').innerHTML = `
+                    <p style="color:green;">Success! Employee ID: ${contactId}</p>
+                    <p>Added to company: ${company.name}</p>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <p style="color:red;">Error: ${error.message}</p>
+                `;
+            }
+        });
+        
+        async function addEmployeeToCompany(companyId, employeeData) {
+            const db = firebase.database();
+            const contactId = db.ref('contacts').push().key;
+            
+            await db.ref().update({
+                [`contacts/${contactId}`]: {
+                    ...employeeData,
+                    companyId: companyId
+                },
+                [`companies/${companyId}/contacts/${contactId}`]: true
+            });
+            
+            return contactId;
+        }
+    </script>
+</body>
+</html>

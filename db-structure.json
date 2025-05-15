@@ -1,0 +1,45 @@
+{
+  "clients": {
+    "comp_xyz123": {
+      "name": "XYZ Corp",
+      "payFrequency": "monthly",
+      "primaryContact": "cont_abc456",
+      "diaryRefs": {
+        "daily": true,
+        "payment": true,
+        "worksheets": true
+      },
+      "createdAt": 1690000000000
+    }
+  },
+  "contacts": {
+    "cont_abc456": {
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "john@xyzcorp.com",
+      "companyId": "comp_xyz123",
+      "phones": {
+        "mobile": "+447700900123"
+      }
+    }
+  },
+  "diaries": {
+    "daily": {
+      "entry_789": {
+        "clientId": "comp_xyz123",
+        "date": "2023-08-15",
+        "notes": "Discussed payment delay",
+        "bfDate": "2023-08-22",
+        "createdBy": "user123"
+      }
+    },
+    "payment": {
+      "inv_456": {
+        "clientId": "comp_xyz123",
+        "amount": 1500,
+        "status": "pending",
+        "dueDate": "2023-08-20"
+      }
+    }
+  }
+}

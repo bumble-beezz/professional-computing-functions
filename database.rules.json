@@ -1,0 +1,30 @@
+{
+    "rules": {
+      "clients": {
+        "$clientId": {
+          ".read": "auth != null",
+          ".write": "auth != null && (newData.exists() || root.child('userPermissions/'+auth.uid+'/admin').val() === true)",
+          "diaryRefs": {
+            "$diaryType": {
+              ".validate": "root.child('diaries/'+$diaryType).exists()"
+            }
+          }
+        }
+      },
+      "diaries": {
+        "$diaryType": {
+          "$entryId": {
+            ".read": "auth != null",
+            ".write": "auth != null && newData.child('clientId').val() == $clientId && root.child('clients/'+newData.child('clientId').val()+'/diaryRefs/'+$diaryType).exists()",
+            ".validate": "newData.hasChildren(['clientId', 'createdAt'])"
+          }
+        }
+      },
+      "contacts": {
+        "$contactId": {
+          ".read": "auth != null",
+          ".write": "auth != null && (newData.child('companyId').val() == null || root.child('clients/'+newData.child('companyId').val()).exists())"
+        }
+      }
+    }
+  }
