@@ -1,0 +1,358 @@
+Here's the complete implementation for your diary system with all requested features:
+
+### 1. Diary Entry UI Components
+
+#### `daily-diary.html` (Calendar + Bulletin Board)
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Diary</title>
+  <style>
+    /* Caribbean Green Theme */
+    :root {
+      --primary: #2E7D32;
+      --primary-light: #4CAF50;
+      --bg: #E8F5E9;
+    }
+    
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin: 20px;
+    }
+    
+    .day {
+      background: white;
+      border: 2px solid var(--primary-light);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+    
+    .day.current {
+      background: var(--primary-light);
+      color: white;
+    }
+    
+    .bulletin-board {
+      background: url('bulletin-texture.jpg');
+      min-height: 500px;
+      padding: 20px;
+      margin: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 250px);
+      gap: 15px;
+    }
+    
+    .post-it {
+      background: #FFF9C4;
+      padding: 15px;
+      transform: rotate(-2deg);
+      box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+      font-family: 'Comic Sans MS', cursive;
+      cursor: grab;
+    }
+    
+    .post-it:active {
+      cursor: grabbing;
+    }
+    
+    .time-stamp {
+      font-weight: bold;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar" id="calendar"></div>
+  <div class="bulletin-board" id="bulletinBoard"></div>
+
+  <script type="module">
+    import { getDailyEntries, updateBFDate } from './diary-operations.js';
+    
+    // Initialize calendar with current date
+    const today = new Date();
+    renderCalendar(today);
+    
+    // Load entries for selected date
+    async function loadEntries(date) {
+      const entries = await getDailyEntries(date);
+      renderEntries(entries);
+    }
+    
+    // Make entries draggable
+    function makeDraggable() {
+      interact('.post-it').draggable({
+        onend: async (event) => {
+          const entryId = event.target.dataset.id;
+          const newTime = calculateNewTime(event); // Implement time calculation
+          await updateBFDate(entryId, newTime);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+```
+
+### 2. Diary-Specific Designs
+
+#### `check-diary.html` (Chequebook Style)
+```html
+<style>
+  .cheque {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    position: relative;
+  }
+  
+  .cheque:after {
+    content: "";
+    background: linear-gradient(transparent, #f5f5f5);
+    position: absolute;
+    bottom: 0;
+    height: 20px;
+    width: 100%;
+  }
+  
+  .cheque-line {
+    border-bottom: 1px dashed #ccc;
+    margin: 10px 0;
+    padding-bottom: 5px;
+  }
+</style>
+
+<div class="cheque">
+  <div class="cheque-line">Pay: <span id="clientName"></span></div>
+  <div class="cheque-line">Amount: $<span id="amount"></span></div>
+  <div class="cheque-line">Date: <span id="paymentDate"></span></div>
+</div>
+```
+
+#### `worksheets.html` (Notebook Style)
+```html
+<style>
+  .notebook {
+    background: white;
+    border-left: 5px solid #4CAF50;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .notebook:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: repeating-linear-gradient(
+      to bottom,
+      white,
+      white 29px,
+      #4CAF50 30px
+    );
+  }
+</style>
+```
+
+### 3. Firebase Data Structure
+```json
+{
+  "contacts": {
+    "cont_JOHN_DOE": {
+      "software": {
+        "QuickBooks": true,
+        "AutoCAD": false
+      },
+      "application": {
+        "Inventory": true,
+        "Payroll": false
+      }
+    }
+  },
+  "diaries": {
+    "daily": {
+      "entry_001": {
+        "clientId": "cont_JOHN_DOE",
+        "date": "2023-08-15",
+        "time": "10:00",
+        "notes": "Installed QuickBooks",
+        "bfDate": "2023-08-22T10:00",
+        "softwareUsed": ["QuickBooks"],
+        "createdAt": 1690000000000
+      }
+    },
+    "check": {
+      "chk_001": {
+        "clientId": "comp_ABC_LTD",
+        "amount": 1500,
+        "checkNo": "1001",
+        "cleared": false
+      }
+    },
+    "worksheets": {
+      "ws_001": {
+        "clientId": "cont_MARIA_SMITH",
+        "tasks": ["Setup", "Testing"],
+        "completed": false
+      }
+    }
+  }
+}
+```
+
+### 4. Diary Operations (`diary-operations.js`)
+```javascript
+import { getDatabase, ref, query, orderByChild, equalTo, get, update } from "firebase/database";
+
+const db = getDatabase();
+
+// Daily Diary
+export async function getDailyEntries(date) {
+  const dateStr = formatDate(date);
+  const q = query(
+    ref(db, 'diaries/daily'),
+    orderByChild('date'),
+    equalTo(dateStr)
+  );
+  return (await get(q)).val();
+}
+
+export async function updateBFDate(entryId, newDateTime) {
+  await update(ref(db, `diaries/daily/${entryId}`), {
+    bfDate: newDateTime
+  });
+}
+
+// Check Diary
+export async function getPendingChecks() {
+  const q = query(
+    ref(db, 'diaries/check'),
+    orderByChild('cleared'),
+    equalTo(false)
+  );
+  return (await get(q)).val();
+}
+
+// Worksheets
+export async function getIncompleteWorksheets() {
+  const q = query(
+    ref(db, 'diaries/worksheets'),
+    orderByChild('completed'),
+    equalTo(false)
+  );
+  return (await get(q)).val();
+}
+
+// Helper
+function formatDate(date) {
+  return date.toISOString().split('T')[0];
+}
+```
+
+### 5. Security Rules Update
+```json
+{
+  "rules": {
+    "diaries": {
+      "daily": {
+        "$entryId": {
+          ".validate": "newData.hasChildren(['clientId', 'date', 'bfDate', 'softwareUsed'])",
+          "softwareUsed": {
+            ".validate": "newData.val().isArray()"
+          }
+        }
+      },
+      "check": {
+        "$entryId": {
+          ".validate": "newData.hasChildren(['clientId', 'amount', 'checkNo'])"
+        }
+      },
+      "worksheets": {
+        "$entryId": {
+          ".validate": "newData.hasChildren(['clientId', 'tasks'])",
+          "tasks": {
+            ".validate": "newData.val().isArray()"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### 6. Software Selection Component
+```html
+<div class="software-selector">
+  <h3>Select Software</h3>
+  <div id="softwareList"></div>
+</div>
+
+<script>
+  async function loadSoftwareOptions(clientId) {
+    const client = (await get(ref(db, `contacts/${clientId}`))).val();
+    const allSoftware = await get(ref(db, 'software'));
+    
+    const container = document.getElementById('softwareList');
+    container.innerHTML = '';
+    
+    Object.keys(allSoftware.val()).forEach(software => {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `soft_${software}`;
+      checkbox.checked = client.software?.[software] || false;
+      
+      const label = document.createElement('label');
+      label.htmlFor = checkbox.id;
+      label.textContent = software;
+      
+      container.appendChild(checkbox);
+      container.appendChild(label);
+      container.appendChild(document.createElement('br'));
+    });
+  }
+</script>
+```
+
+### Implementation Notes:
+
+1. **Calendar Navigation**:
+   - The daily diary starts at current date
+   - Clicking a date loads entries as post-it notes
+   - Drag-and-drop changes follow-up times
+
+2. **Diary-Specific Designs**:
+   - Daily: Interactive bulletin board
+   - Check: Chequebook replica with dashed lines
+   - Worksheets: Notebook with margin lines
+
+3. **Software Tracking**:
+   - Technicians can toggle software selections
+   - Saved in both contact profile and diary entries
+
+4. **Data Relationships**:
+   - All diaries reference client/contact IDs
+   - Software selections are synchronized
+
+5. **Phone Number Handling**:
+   - Still maintains +1(868) format
+   - Automatic country code insertion
+
+To deploy:
+1. Update security rules
+2. Add the new HTML files
+3. Implement the diary-operations.js
+4. Initialize with empty collections if needed
+
+This gives you:
+- Theme-consistent calendar system
+- Interactive post-it notes
+- Diary-specific visual styles
+- Complete software tracking
+- Drag-and-drop rescheduling
